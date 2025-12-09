@@ -11,6 +11,7 @@ import z from "zod";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
+import { onInvoke } from "../actions";
 
 const formSchema = z.object({
   content: z
@@ -70,6 +71,17 @@ const PROJECT_TEMPLATES = [
   },
 ];
 
+const onInvokeAI = async () => {
+  try {
+    const res = await onInvoke();
+    console.log(res);
+    toast.success("Done");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
 const ProjectsForm = () => {
   const [isFocused, setIsFocused] = useState(false);
   const router = useRouter();
@@ -94,6 +106,8 @@ const ProjectsForm = () => {
   return (
     <div className="space-y-8">
       {/* Template Grid */}
+
+      <Button  onClick={onInvokeAI}>Invoke AI Agent</Button>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {PROJECT_TEMPLATES.map((template, index) => (
           <button
@@ -134,11 +148,11 @@ const ProjectsForm = () => {
             isFocused && "shadow-lg ring-2 ring-primary/20"
           )}
         >
-         <FormField
-         control={form.control}
-         name="content"
-         render={({field})=>(
-                <TextAreaAutosize
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <TextAreaAutosize
                 {...field}
                 // disabled={isPending}
                 placeholder="Describe what you want to create..."
@@ -147,8 +161,8 @@ const ProjectsForm = () => {
                 minRows={3}
                 maxRows={8}
                 className={cn(
-                  "pt-4 resize-none border-none w-full outline-none bg-transparent",
-                //   isPending && "opacity-50"
+                  "pt-4 resize-none border-none w-full outline-none bg-transparent"
+                  //   isPending && "opacity-50"
                 )}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -157,23 +171,20 @@ const ProjectsForm = () => {
                   }
                 }}
               />
-         )}
-         />   
+            )}
+          />
 
-         <div className="flex gap-x-2 items-end justify-between pt-2">
+          <div className="flex gap-x-2 items-end justify-between pt-2">
             <div className="text-[10px] text-muted-foreground font-mono">
-                 <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+              <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
                 <span>&#8984;</span>Enter
               </kbd>
               &nbsp; to submit
             </div>
-            <Button
-            className={cn("size-8 rounded-full")}
-            type="submit"
-            >
-                <ArrowUpIcon className="size-4"/>
+            <Button className={cn("size-8 rounded-full")} type="submit">
+              <ArrowUpIcon className="size-4" />
             </Button>
-         </div>
+          </div>
         </form>
       </Form>
     </div>
