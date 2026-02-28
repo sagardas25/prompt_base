@@ -1,8 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { ModeToggle } from "@/components/ui/toggle-dark";
 
 const Navbar = () => {
   return (
@@ -20,23 +27,23 @@ const Navbar = () => {
 
         <SignedOut>
           <div className=" flex gap-2">
-						<SignInButton>
-							<Button variant={"outline"} size={"sm"}>
-								Sign In
-							</Button>
-						</SignInButton>
+            <ModeToggle></ModeToggle>
+            <SignInButton>
+              <Button variant={"outline"} size={"sm"}>
+                Sign In
+              </Button>
+            </SignInButton>
 
-						<SignUpButton>
-								<Button  size={"sm"}>
-								Sign Up
-							</Button>
-						</SignUpButton>
-					</div>
+            <SignUpButton>
+              <Button size={"sm"}>Sign Up</Button>
+            </SignUpButton>
+          </div>
         </SignedOut>
 
-				<SignedIn>
-					<UserButton/>
-				</SignedIn>
+        <SignedIn>
+          <ModeToggle></ModeToggle>
+          <UserButton />
+        </SignedIn>
       </div>
     </nav>
   );
