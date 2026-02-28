@@ -2,6 +2,8 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React from "react";
 
+import ProjectsForm from "@/modules/home/components/projectForm";
+
 const Page = () => {
   return (
     <div className="flex items-center justify-center w-full px-4 py-8">
@@ -24,7 +26,7 @@ const Page = () => {
             Create apps and websites by chatting with AI
           </p>
 
-          <div className="max-w-3xl w-full">{/* <ProjectsForm /> */}</div>
+          <div className="max-w-3xl w-full"> <ProjectsForm /></div>
           {/* ProjectList */}
         </section>
       </div>
