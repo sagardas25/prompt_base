@@ -1,92 +1,87 @@
-"use server";
-import db from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
-import { Select } from "react-day-picker";
-import { success } from "zod";
+import db from "@/lib/db.js";
 
+// save the user data
 export const onBoardUser = async () => {
   try {
     const user = await currentUser();
 
+    // console.log("user : ", user);
+    // console.log("email -add : ", user.emailAddresses?.[0]?.emailAddress);
+
     if (!user) {
       return {
         success: false,
-        message: "No user logged in",
+        error: " no authenticated user found",
       };
     }
 
-    const { firstName, lastName, imageUrl, emailAddresses } = user;
+    const { id, firstName, lastName, emailAddresses, imageUrl } = user;
 
+    //either update an existing user or create a new one
     const newUser = await db.user.upsert({
       where: {
-        clerkId: user.id,
+        clerkid: id,
       },
       update: {
-        email: emailAddresses[0]?.emailAddress || "",
         name:
           firstName && lastName
             ? `${firstName} ${lastName}`
             : firstName || lastName || null,
+
+        email: emailAddresses?.[0]?.emailAddress || null,
         image: imageUrl || null,
       },
       create: {
-        clerkId: user.id,
-        email: emailAddresses[0]?.emailAddress || "",
+        clerkid: id,
         name:
           firstName && lastName
             ? `${firstName} ${lastName}`
             : firstName || lastName || null,
+        email: emailAddresses?.[0]?.emailAddress || null,
         image: imageUrl || null,
       },
     });
 
     return {
-      user: newUser,
       success: true,
-      message: "User onboarded successfully",
+      user: newUser,
+      message: "user onboarded successfully",
     };
   } catch (error) {
-    console.error("Error onboarding user:", error);
+    console.log("Error onboarding user : ", error);
     return {
       success: false,
-      message: "Failed to onboard user",
+      message: "user onboarding failed",
+    };
   }
-}; }
+};
 
-export const getCurrentUser = async (params) => {
+// get the current user
+export const getCurrentUser = async () => {
   try {
     const user = await currentUser();
-
     if (!user) {
-      throw new Error("User not found");
+      return null;
     }
 
+    // find the user based on if from db
     const dbUser = await db.user.findUnique({
       where: {
-        clerkId: user.id,
+        clerkid: user.id,
       },
-      Select: {
+      select: {
         id: true,
-        clerkId: true,
         email: true,
         name: true,
         image: true,
+        clerkid: true,
       },
     });
 
-    if (!dbUser) {
-      return {
-        success: false,
-        message: "User not found in database",
-      }
-    }
-
     return dbUser;
   } catch (error) {
-    console.error("Error retrieving user:", error);
-    return {
-      success: false,
-      message: "Failed to retrieve user",
-    }
+    console.log("error fetching user , error : ", error);
+    return null;
   }
 };

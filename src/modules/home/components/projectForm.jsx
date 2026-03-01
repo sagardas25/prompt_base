@@ -7,11 +7,10 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
 import z from "zod";
+import { Form, FormField } from "@/components/ui/form";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Form, FormField } from "@/components/ui/form";
-import { onInvoke } from "../actions";
 
 const formSchema = z.object({
   content: z
@@ -71,16 +70,15 @@ const PROJECT_TEMPLATES = [
   },
 ];
 
-const onInvokeAI = async () => {
-  try {
-    const res = await onInvoke();
-    console.log(res);
-    toast.success("Done");
-  } catch (error) {
-    console.log(error);
-  }
-};
-
+// const onInvokeAI = async () => {
+//   try {
+//     const res = await onInvoke();
+//     console.log(res);
+//     toast.success("Done");
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 const ProjectsForm = () => {
   const [isFocused, setIsFocused] = useState(false);
@@ -107,7 +105,7 @@ const ProjectsForm = () => {
     <div className="space-y-8">
       {/* Template Grid */}
 
-      <Button  onClick={onInvokeAI}>Invoke AI Agent</Button>
+  
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {PROJECT_TEMPLATES.map((template, index) => (
           <button
@@ -145,7 +143,7 @@ const ProjectsForm = () => {
           onSubmit={form.handleSubmit(onSubmit)}
           className={cn(
             "relative border p-4 pt-1 rounded-xl bg-sidebar dark:bg-sidebar transition-all",
-            isFocused && "shadow-lg ring-2 ring-primary/20"
+            isFocused && "shadow-lg ring-2 ring-primary/20",
           )}
         >
           <FormField
@@ -161,7 +159,7 @@ const ProjectsForm = () => {
                 minRows={3}
                 maxRows={8}
                 className={cn(
-                  "pt-4 resize-none border-none w-full outline-none bg-transparent"
+                  "pt-4 resize-none border-none w-full outline-none bg-transparent",
                   //   isPending && "opacity-50"
                 )}
                 onKeyDown={(e) => {
