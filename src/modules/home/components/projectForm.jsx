@@ -70,15 +70,6 @@ const PROJECT_TEMPLATES = [
   },
 ];
 
-// const onInvokeAI = async () => {
-//   try {
-//     const res = await onInvoke();
-//     console.log(res);
-//     toast.success("Done");
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
 
 const ProjectsForm = () => {
   const [isFocused, setIsFocused] = useState(false);
