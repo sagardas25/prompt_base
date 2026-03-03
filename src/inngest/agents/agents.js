@@ -6,17 +6,21 @@ import {
 } from "@inngest/agent-kit";
 import Sandbox from "e2b";
 import z from "zod";
+import { PROMPT } from "../constants/prompt.js";
+import { lastAssistantTextMessageContent } from "../utils/util.js";
 
-export const codeAgent = ({ sandBoxId, event }) => {
+export const codeAgent = async ({ sandBoxId, event }) => {
+  // console.log("event  2: ", event);
+
   const supportAgent = createAgent({
     name: "code-agent",
-    Description: "An expert coding agent",
-    system: "you are a helpfull Ai-agent.Aways greet user with politeness",
+    description: "An expert coding agent",
+    system: PROMPT,
     model: gemini({
       model: "gemini-2.5-flash",
     }),
 
-    Tools: [
+    tools: [
       // 1. Terminals
       createTool({
         name: "terminal_tool",
@@ -26,13 +30,17 @@ export const codeAgent = ({ sandBoxId, event }) => {
         }),
 
         handler: async ({ command }, { network, agent, step }) => {
+      
           await step?.run("terminal", async () => {
             const buffers = { stdout: "", stderr: "" };
 
             try {
               const sandbox = await Sandbox.connect(sandBoxId);
+              const res =  await sandbox.commands.run("lsof -i :3000");
+              console.log("res : ",res);
+              
 
-              const result = await sandbox.commands(CommandSeparator, {
+              const result = await sandbox.commands.run(command, {
                 onStdout: (data) => {
                   buffers.stdout += data;
                 },
@@ -59,12 +67,12 @@ export const codeAgent = ({ sandBoxId, event }) => {
           files: z.array(
             z.object({
               path: z.string(),
-              file: z.string(),
+              content: z.string(),
             }),
           ),
         }),
 
-        handlers: async ({ files }, { step, network }) => {
+        handler: async ({ files }, { step, network }) => {
           const newFile = await step?.run("createOrUpdateFile", async () => {
             try {
               const updatedFiles = (await network?.state?.data.files) || {};
@@ -112,21 +120,33 @@ export const codeAgent = ({ sandBoxId, event }) => {
         },
       }),
     ],
+
+    lifecycle: {
+      onResponse: async ({ result, network }) => {
+        const lastAssistantMessage = lastAssistantTextMessageContent(result);
+        if (lastAssistantMessage && network) {
+          if (lastAssistantMessage.includes("<task_summary>")) {
+            network.state.data.summary = lastAssistantMessage;
+          }
+        }
+        return result;
+      },
+    },
   });
 
   const network = createNetwork({
     name: "coding-agent-network",
-    agents: [codeAgent],
+    agents: [supportAgent],
     maxIter: 10,
     router: async ({ network }) => {
       const summary = network.state.data.summary;
       if (summary) return;
 
-      return codeAgent;
+      return supportAgent;
     },
   });
 
-  const result = network.run(event.data.value);
+  const result = await network.run(event.data.value);
 
-  return result;
+  return { result, state: result.state };
 };
