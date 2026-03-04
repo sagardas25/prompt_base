@@ -11,6 +11,7 @@ import { lastAssistantTextMessageContent } from "./utils/util.js";
 import { PROMPT } from "./constants/prompt.js";
 import z from "zod";
 import { MessageRole, MessageType } from "@/db/client";
+import { Fragment } from "react";
 
 export const codeAgentFunction = inngest.createFunction(
   { id: "prompt-base" },
@@ -177,12 +178,46 @@ export const codeAgentFunction = inngest.createFunction(
 
     const finalOutput = await network.run(event.data.value);
 
+    const isError =
+      !finalOutput.state.data.summary ||
+      Object.keys(finalOutput.state.data.files || {}).length == 0;
+
     // get sandbox url
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       const sandbox = await Sandbox.connect(sandBoxId);
       const host = sandbox.getHost(3000);
       const url = `https://${host}`;
       return url;
+    });
+
+    // save-results
+    await step.run("save-results", async () => {
+      if (isError) {
+        return await db.message.create({
+          data: {
+            projectId: event.data.projectId,
+            content: "something went wrong . Please try again",
+            role: MessageRole.ASSISTANT,
+            type: MessageType.ERROR,
+          },
+        });
+      }
+
+      return await db.message.create({
+        data: {
+          projectId: event.data.projectId,
+          content: finalOutput.state.data.summary,
+          role: MessageRole.ASSISTANT,
+          type: MessageType.RESULT,
+          fragments: {
+            create: {
+              sandboxUrl: sandboxUrl,
+              title: "untitled",
+              files: finalOutput.state.data,
+            },
+          },
+        },
+      });
     });
 
     return {

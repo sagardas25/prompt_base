@@ -14,6 +14,7 @@ export const createProject = async (value) => {
 
   // create a project and store in db
   const newProject = await db.project.create({
+    
     name: generateSlug(2, { format: "title" }),
     userId: user.id,
     messages: {
