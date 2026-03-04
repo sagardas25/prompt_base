@@ -9,4 +9,7 @@
  * 🟢 You can import this file directly.
  */
 export type * from './models/User.ts'
+export type * from './models/Project.ts'
+export type * from './models/Message.ts'
+export type * from './models/Fragment.ts'
 export type * from './commonInputTypes.ts'
