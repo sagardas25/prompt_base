@@ -46,11 +46,10 @@ export const getProjects = async () => {
   const user = await getCurrentUser();
   if (!user) throw new Error("unauthrized");
 
-  const projects = await db.findMany({
+  const projects = await db.project.findMany({
     where: {
-      userid: user.id,
+      userId: user.id,
     },
-
     orderBy: {
       createdAt: "desc",
     },
@@ -64,7 +63,7 @@ export const getProjectById = async (projectId) => {
   const user = await getCurrentUser();
   if (!user) throw new Error("unauthrized");
 
-  const project = await db.findUnique({
+  const project = await db.project.findUnique({
     where: {
       id: projectId,
       userId: user.id,
