@@ -9,18 +9,20 @@ export const createMessage = async (value, projectId) => {
   const user = await getCurrentUser();
   if (!user) throw new Error("unauthorized");
 
-  const project = await db.project.findUnique({
+  const project = await db.project.findFirst({
     where: {
-      projectId,
+      id : projectId,
       userId: user.id,
     },
   });
 
   if (!project) throw new Error("no project found");
+  console.log("project : ", project);
+  
 
   const newMessage = await db.message.create({
     data: {
-      projectId,
+      projectId : project.id,
       content: value,
       role: MessageRole.USER,
       type: MessageType.RESULT,
@@ -31,7 +33,7 @@ export const createMessage = async (value, projectId) => {
     name: "code-agent/run",
     data: {
       value: value,
-      projectId: projectId,
+      projectId: project.id,
     },
   });
 
@@ -44,7 +46,7 @@ export const getMessages = async (projectId) => {
 
   const project = await db.project.findUnique({
     where: {
-      projectId,
+      id : projectId,
       userId: user.id,
     },
   });

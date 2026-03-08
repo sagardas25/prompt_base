@@ -4,7 +4,6 @@ import {
   getProjectById,
   getProjects,
 } from "../actions/index.js";
-import { queryKeys } from "inngest";
 
 export const useGetProjects = () => {
   return useQuery({
@@ -18,7 +17,7 @@ export const useCreateProject = () => {
   return useMutation({
     mutationFn: (value) => createProject(value),
     onSuccess: () => {
-      queryClient.invalidateQueries(["projects"]);
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 };

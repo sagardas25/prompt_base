@@ -6,9 +6,9 @@ import {
 } from "@tanstack/react-query";
 import { createMessage, getMessages } from "../action";
 
-export const prefetchMessage = async (queryClient, projectId) => {
+export const prefetchMessages = async (queryClient, projectId) => {
   await queryClient.prefetchQuery({
-    queryKeys: ["messages", projectId],
+    queryKey: ["messages", projectId],
     queryFn: () => getMessages(projectId),
     staleTime: 10000,
   });
@@ -16,7 +16,7 @@ export const prefetchMessage = async (queryClient, projectId) => {
 
 export const useGetMessages = (projectId) => {
   return useQuery({
-    queryKeys: ["messages", projectId],
+    queryKey: ["messages", projectId],
     queryFn: () => getMessages(projectId),
     staleTime: 10000,
     refetchInterval: (data) => {
@@ -25,11 +25,11 @@ export const useGetMessages = (projectId) => {
   });
 };
 
-export const useCreateMessages = (value, projectId) => {
+export const useCreateMessages = ( projectId) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => createMessage(value, projectId),
+    mutationFn: (value) => createMessage(value, projectId),
 
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -38,3 +38,5 @@ export const useCreateMessages = (value, projectId) => {
     },
   });
 };
+
+
