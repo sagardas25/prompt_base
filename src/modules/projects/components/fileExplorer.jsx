@@ -139,7 +139,7 @@ export const FileExplorer = ({ files }) => {
       {/* FILE TREE */}
       <ResizablePanel
         defaultSize={25}
-        minSize={15}
+        minSize={100}
         maxSize={500}
         className="bg-sidebar border-r"
       >

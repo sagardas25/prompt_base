@@ -43,9 +43,9 @@ const MessageLoading = () => {
         <Image
           src={"/logo.svg"}
           alt="Vibe"
-          width={28}
-          height={28}
-          className="shrink-0 invert dark:invert-0"
+          width={18}
+          height={18}
+          className="hidden md:block dark:invert"
         />
       </div>
 

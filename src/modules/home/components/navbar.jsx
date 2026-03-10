@@ -19,9 +19,9 @@ const Navbar = () => {
           <Image
             src={"/logo.svg"}
             alt="Vibe"
-            width={32}
-            height={32}
-            className="shrink-0 invert dark:invert-0"
+            width={28}
+            height={28}
+            className="shrink-0 hidden md:block dark:invert"
           />
         </Link>
 

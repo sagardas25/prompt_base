@@ -10,13 +10,13 @@ const Page = () => {
     <div className="flex items-center justify-center w-full px-4 py-8">
       <div className="max-w-5xl w-full">
         <section className="space-y-8 flex flex-col items-center">
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center  ">
             <Image
-              src={"/logo.svg"}
-              width={100}
-              height={100}
+              src={"/home.svg"}
+              width={200}
+              height={200}
               alt="Logo"
-              className="hidden md:block invert dark:invert-0"
+              className="hidden md:block dark:invert"
             />
           </div>
           <h1 className="text-2xl md:text-5xl font-bold text-center">

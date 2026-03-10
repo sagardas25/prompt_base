@@ -8,7 +8,11 @@ import {
   gemini,
 } from "@inngest/agent-kit";
 import { lastAssistantTextMessageContent } from "./utils/util.js";
-import { PROMPT } from "./constants/prompt.js";
+import {
+  FRAGMENT_TITLE_PROMPT,
+  PROMPT,
+  RESPONSE_PROMPT,
+} from "./constants/prompt.js";
 import z from "zod";
 import { MessageRole, MessageType } from "@/prisma-db/client";
 import db from "@/lib/db.js";
@@ -34,7 +38,7 @@ export const codeAgentFunction = inngest.createFunction(
       description: "An expert coding agent",
       system: PROMPT,
       model: gemini({
-        model: "gemini-2.5-flash"
+        model: "gemini-2.5-flash",
       }),
 
       tools: [
@@ -165,7 +169,7 @@ export const codeAgentFunction = inngest.createFunction(
     const network = createNetwork({
       name: "coding-agent-network",
       agents: [supportAgent],
-      maxIter: 10,
+      maxIter: 5,
       router: async ({ network }) => {
         // if summary is there then stop
         const summary = network.state.data.summary;
@@ -177,6 +181,83 @@ export const codeAgentFunction = inngest.createFunction(
     });
 
     const finalOutput = await network.run(event.data.value);
+
+    const fragmentTitleGeneratorAgent = createAgent({
+      name: "fragment-title-generator",
+      description: "Generate a title for the fragment",
+      system: FRAGMENT_TITLE_PROMPT,
+      model: gemini({ model: "gemini-2.5-flash" }),
+    });
+
+    console.log("SUMMARY:", finalOutput?.state?.data?.summary);
+    const summ = finalOutput?.state?.data?.summary;
+
+    const fragmentTitle = await step.run("fragment-title-run", async () => {
+      if (summ) {
+        const { fragmentTitle } = await fragmentTitleGeneratorAgent.run(summ);
+        return fragmentTitle;
+      }
+      return "Untitled";
+    });
+
+    const generateFragmentTitle = () => {
+      if (!fragmentTitle) {
+        return "Untitled";
+      }
+
+      if (!Array.isArray(fragmentTitle)) {
+        return "Untitled";
+      }
+
+      if (!fragmentTitle[0] || fragmentTitle[0].type != "text") {
+        return "Untitled";
+      }
+
+      const content = fragmentTitle[0].content;
+
+      if (Array.isArray(content)) {
+        return content.join("");
+      }
+
+      return content || "Untitled";
+    };
+
+    const responseGeneratorAgent = createAgent({
+      name: "response-generator",
+      description: "Generate a response for the fragment",
+      system: RESPONSE_PROMPT,
+      model: gemini({ model: "gemini-2.5-flash" }),
+    });
+
+    const responsePart = await step.run("response-generate-run", async () => {
+      if (summ) {
+        const { response } = await responseGeneratorAgent.run(summ);
+        return response;
+      }
+      return "Here you go '";
+    });
+
+    const generateResponse = () => {
+      if (!responsePart) {
+        return "Here you go";
+      }
+
+      if (!Array.isArray(responsePart)) {
+        return "Here you go";
+      }
+
+      if (!responsePart[0] || responsePart[0].type != "text") {
+        return "Here you go";
+      }
+
+      const content = responsePart[0].content;
+
+      if (Array.isArray(content)) {
+        return content.join("");
+      }
+
+      return content || "Here you go";
+    };
 
     const isError =
       !finalOutput.state.data.summary ||
@@ -192,6 +273,9 @@ export const codeAgentFunction = inngest.createFunction(
 
     // save-results
     await step.run("save-results", async () => {
+      if (!event.data.projectId) {
+        throw new Error("project id is missing");
+      }
       if (isError) {
         return await db.message.create({
           data: {
@@ -206,13 +290,13 @@ export const codeAgentFunction = inngest.createFunction(
       return await db.message.create({
         data: {
           projectId: event.data.projectId,
-          content: finalOutput.state.data.summary,
+          content: generateResponse(),
           role: MessageRole.ASSISTANT,
           type: MessageType.RESULT,
           fragments: {
             create: {
               sandboxUrl: sandboxUrl,
-              title: "untitled",
+              title: generateFragmentTitle(),
               files: finalOutput.state.data,
             },
           },
@@ -222,9 +306,9 @@ export const codeAgentFunction = inngest.createFunction(
 
     return {
       url: sandboxUrl,
-      title: "untitled",
+      title: generateFragmentTitle(),
       files: finalOutput.state.data.files,
-      summary: finalOutput.state.data.summary,
+      summary: generateResponse(),
     };
   },
 );

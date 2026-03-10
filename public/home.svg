@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 150" width="100%" height="100%" shape-rendering="geometricPrecision">
+  <g fill="none" stroke="#0A0A0A" stroke-width="12" stroke-linejoin="miter" stroke-miterlimit="10">
+    <polygon points="85,25 140,55 85,85 30,55" />
+    
+    <polyline points="30,78 85,108 140,78" />
+    
+    <polyline points="30,101 85,131 140,101" />
+  </g>
+
+  <text 
+x="170" 
+y="108" 
+font-family="'Inter', 'Plus Jakarta Sans', 'Montserrat', system-ui, sans-serif"
+font-size="86"
+font-weight="700"
+fill="#0A0A0A"
+letter-spacing="-0.03em"
+text-rendering="geometricPrecision"
+>
+stackgen
+</text>
+</svg>

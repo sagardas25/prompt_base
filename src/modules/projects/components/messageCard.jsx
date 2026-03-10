@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ChevronRightIcon, Code2Icon } from "lucide-react";
 import Image from "next/image";
 import React from "react";
+import ReactMarkdown from "react-markdown";
 
 /* Fragment Card */
 const FragmentCard = ({ fragment, isActiveFragment, onFragmentClick }) => {
@@ -15,7 +16,7 @@ const FragmentCard = ({ fragment, isActiveFragment, onFragmentClick }) => {
       className={cn(
         "flex items-start text-start gap-2 border rounded-lg bg-muted w-fit p-2 transition-colors hover:bg-secondary",
         isActiveFragment &&
-          "bg-primary text-primary-foreground border-primary hover:bg-primary"
+          "bg-primary text-primary-foreground border-primary hover:bg-primary",
       )}
     >
       <Code2Icon className="size-4 mt-0.5" />
@@ -56,7 +57,7 @@ const AssistantMessage = ({
     <div
       className={cn(
         "flex flex-col group px-2 pb-4",
-        type === MessageType.ERROR && "text-red-700 dark:text-red-500"
+        type === MessageType.ERROR && "text-red-700 dark:text-red-500",
       )}
     >
       {/* Header */}
@@ -64,19 +65,23 @@ const AssistantMessage = ({
         <Image
           alt="logo-image"
           src="/logo.svg"
-          height={30}
-          width={30}
-          className="invert dark:invert-0"
+          height={20}
+          width={20}
+          className="hidden md:block dark:invert"
         />
 
-        <span className="text-xs text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
+        <span className="text-xs text-muted-foreground opacity-100 transition-opacity group-hover:opacity-100">
           {format(new Date(createdAt), "HH:mm 'on' MMM dd, yyyy")}
         </span>
       </div>
 
       {/* Content */}
       <div className="pl-8 flex flex-col gap-y-4">
-        {content && <span>{content}</span>}
+        {content && (
+          <div className="prose prose-neutral dark:prose-invert max-w-none">
+            <ReactMarkdown>{content}</ReactMarkdown>
+          </div>
+        )}
 
         {fragment && type === MessageType.RESULT && (
           <FragmentCard
@@ -122,12 +127,3 @@ const MessageCard = ({
 };
 
 export default MessageCard;
-
-
-
-
-
-
-
-
-
