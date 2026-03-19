@@ -179,7 +179,7 @@ flowchart TB
 
 ```
 
-    ---
+  ---
 
 ## 🛠️ Tech Stack
 
