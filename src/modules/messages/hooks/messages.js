@@ -25,18 +25,18 @@ export const useGetMessages = (projectId) => {
   });
 };
 
-export const useCreateMessages = ( projectId) => {
+export const useCreateMessages = (projectId) => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (value) => createMessage(value, projectId),
-
     onSuccess: () => {
-      queryClient.invalidateQueries({
+      (queryClient.invalidateQueries({
         queryKey: ["messages", projectId],
-      });
+      }),
+        queryClient.invalidateQueries({
+          queryKey: ["status"],
+        }));
     },
   });
 };
-
-

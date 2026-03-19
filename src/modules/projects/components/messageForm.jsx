@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 
 import { useCreateMessages } from "@/modules/messages/hooks/messages";
+import { useStatus } from "@/modules/usage/hooks/usage";
+import { Usage } from "@/modules/usage/components/usage";
 
 const formSchema = z.object({
   content: z
@@ -26,6 +28,10 @@ const MessageForm = ({ projectId }) => {
   const [isFocused, setIsFocused] = useState(false);
 
   const { mutateAsync, isPending } = useCreateMessages(projectId);
+
+  const { data: usage } = useStatus();
+
+  const showUsage = !!usage;
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -50,11 +56,12 @@ const MessageForm = ({ projectId }) => {
 
   return (
     <Form {...form}>
+      {showUsage && <Usage />}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className={cn(
           "relative border p-4 pt-1 rounded-xl bg-sidebar dark:bg-sidebar transition-all",
-          isFocused && "shadow-lg ring-2 ring-primary/20"
+          isFocused && "shadow-lg ring-2 ring-primary/20",
         )}
       >
         <FormField
@@ -71,7 +78,7 @@ const MessageForm = ({ projectId }) => {
               maxRows={8}
               className={cn(
                 "pt-4 resize-none border-none w-full outline-none bg-transparent",
-                isPending && "opacity-50"
+                isPending && "opacity-50",
               )}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -98,14 +105,10 @@ const MessageForm = ({ projectId }) => {
               "size-8 rounded-full transition-colors",
               isPending && "bg-muted-foreground border",
               !isPending && isActive && "bg-primary text-primary-foreground",
-              !isActive && "bg-muted text-muted-foreground"
+              !isActive && "bg-muted text-muted-foreground",
             )}
           >
-            {isPending ? (
-              <Spinner />
-            ) : (
-              <ArrowUpIcon className="size-4" />
-            )}
+            {isPending ? <Spinner /> : <ArrowUpIcon className="size-4" />}
           </Button>
         </div>
       </form>

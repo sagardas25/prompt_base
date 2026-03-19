@@ -5,6 +5,8 @@ import { inngest } from "@/inngest/client";
 import { MessageRole, MessageType } from "@/prisma-db/client";
 import { generateSlug } from "random-word-slugs";
 import { getCurrentUser } from "@/modules/auth/actions";
+import { consumeCredits } from "@/lib/usage";
+
 
 // user create a project by giving prompt
 // eg : create a todo app
@@ -27,6 +29,22 @@ export const createProject = async (value) => {
       },
     },
   });
+
+  try {
+    await consumeCredits();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error({
+        code: "BAD_REQUEST",
+        message: "Something went wrong",
+      });
+    } else {
+      throw new Error({
+        code: "TOO_MANY_REQUESTS",
+        message: "Too many requests",
+      });
+    }
+  }
 
   // invoke ai agent
   // ai agent will get the projectId and will modify that project

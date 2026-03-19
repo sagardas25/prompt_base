@@ -4,6 +4,7 @@ import { MessageRole, MessageType } from "@/prisma-db/client";
 import db from "@/lib/db";
 import { inngest } from "@/inngest/client";
 import { getCurrentUser } from "@/modules/auth/actions";
+import { consumeCredits } from "@/lib/usage";
 
 export const createMessage = async (value, projectId) => {
   const user = await getCurrentUser();
@@ -11,18 +12,33 @@ export const createMessage = async (value, projectId) => {
 
   const project = await db.project.findFirst({
     where: {
-      id : projectId,
+      id: projectId,
       userId: user.id,
     },
   });
 
   if (!project) throw new Error("no project found");
   console.log("project : ", project);
-  
+
+  try {
+    await consumeCredits();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error({
+        code: "BAD_REQUEST",
+        message: "Something went wrong",
+      });
+    } else {
+      throw new Error({
+        code: "TOO_MANY_REQUESTS",
+        message: "Too many requests",
+      });
+    }
+  }
 
   const newMessage = await db.message.create({
     data: {
-      projectId : project.id,
+      projectId: project.id,
       content: value,
       role: MessageRole.USER,
       type: MessageType.RESULT,
@@ -46,7 +62,7 @@ export const getMessages = async (projectId) => {
 
   const project = await db.project.findUnique({
     where: {
-      id : projectId,
+      id: projectId,
       userId: user.id,
     },
   });
@@ -68,5 +84,3 @@ export const getMessages = async (projectId) => {
 
   return messages;
 };
-
-
