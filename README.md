@@ -159,12 +159,12 @@ This is the heart of StackGen — where the AI continuously improves the generat
 flowchart TB
 
     A[Event Trigger] --> B[Inngest Function Starts]
-    B --> C[Sandbox Created (E2B)]
-    C --> D[Agent + Network Initialized]
+    B --> C[Sandbox Created - E2B]
+    C --> D[Agent and Network Initialized]
 
-    D --> E[network.run(input)]
+    D --> E[network.run input]
 
-    subgraph AI Loop
+    subgraph AI_Loop
         E --> F[Model Thinks]
         F --> G[Tools Execute]
         G --> H[Lifecycle Runs]
@@ -179,7 +179,7 @@ flowchart TB
 
 ```
 
-  ---
+---
 
 ## 🛠️ Tech Stack
 
