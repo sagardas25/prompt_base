@@ -7,10 +7,11 @@ import Image from "next/image";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { log } from "@/lib/comment.js";
 
 /* Fragment Card */
 const FragmentCard = ({ fragment, isActiveFragment, onFragmentClick }) => {
-  // console.log("isActiveFragment:", isActiveFragment);
+  // log("isActiveFragment:", isActiveFragment);
 
   return (
     <button
@@ -55,7 +56,8 @@ const AssistantMessage = ({
   onFragmentClick,
   type,
 }) => {
-  console.log("content : ", content);
+  log("process.env.NODE_ENV : ",process.env.NODE_ENV)
+  log("content : ", content);
   return (
     <div
       className={cn(
@@ -81,8 +83,7 @@ const AssistantMessage = ({
       {/* Content */}
       <div className="pl-8 flex flex-col gap-y-4">
         {content && (
-          <div
-            className="prose prose-invert prose-sm max-w-none border-t border-zinc-800 pt-3">
+          <div className="prose prose-invert prose-sm max-w-none border-t border-zinc-800 pt-3">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
           </div>
         )}

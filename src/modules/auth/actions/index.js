@@ -1,13 +1,14 @@
 import { currentUser } from "@clerk/nextjs/server";
 import db from "@/lib/db.js";
+import { log } from "@/lib/comment.js";
 
 // save the user data
 export const onBoardUser = async () => {
   try {
     const user = await currentUser();
 
-    // console.log("user : ", user);
-    // console.log("email -add : ", user.emailAddresses?.[0]?.emailAddress);
+    // log("user : ", user);
+    // log("email -add : ", user.emailAddresses?.[0]?.emailAddress);
 
     if (!user) {
       return {
@@ -49,7 +50,7 @@ export const onBoardUser = async () => {
       message: "user onboarded successfully",
     };
   } catch (error) {
-    console.log("Error onboarding user : ", error);
+    log("Error onboarding user : ", error);
     return {
       success: false,
       message: "user onboarding failed",
@@ -81,7 +82,7 @@ export const getCurrentUser = async () => {
 
     return dbUser;
   } catch (error) {
-    console.log("error fetching user , error : ", error);
+    log("error fetching user , error : ", error);
     return null;
   }
 };

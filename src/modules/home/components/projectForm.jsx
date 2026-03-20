@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import { useCreateProject } from "@/modules/projects/hooks/project";
+import { log } from "@/lib/comment.js";
 
 const formSchema = z.object({
   content: z
@@ -95,7 +96,7 @@ const ProjectsForm = () => {
       toast.success("Project created successfully");
       form.reset();
     } catch (error) {
-      console.log("error in projectsForm  : ", error);
+      log("error in projectsForm  : ", error);
       toast.error(error.message || "Failed to create project");
     }
   };

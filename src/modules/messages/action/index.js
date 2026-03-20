@@ -5,6 +5,7 @@ import db from "@/lib/db";
 import { inngest } from "@/inngest/client";
 import { getCurrentUser } from "@/modules/auth/actions";
 import { consumeCredits } from "@/lib/usage";
+import { log } from "@/lib/comment.js";
 
 export const createMessage = async (value, projectId) => {
   const user = await getCurrentUser();
@@ -18,7 +19,7 @@ export const createMessage = async (value, projectId) => {
   });
 
   if (!project) throw new Error("no project found");
-  console.log("project : ", project);
+  log("project : ", project);
 
   try {
     await consumeCredits();

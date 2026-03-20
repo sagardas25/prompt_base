@@ -6,12 +6,12 @@ import { MessageRole, MessageType } from "@/prisma-db/client";
 import { generateSlug } from "random-word-slugs";
 import { getCurrentUser } from "@/modules/auth/actions";
 import { consumeCredits } from "@/lib/usage";
-
+import { log } from "@/lib/comment.js";
 
 // user create a project by giving prompt
 // eg : create a todo app
 export const createProject = async (value) => {
-  console.log("db : ", Object.keys(db));
+  log("db : ", Object.keys(db));
   const user = await getCurrentUser();
   if (!user) throw new Error("unauthrized");
 

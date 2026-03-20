@@ -1,6 +1,7 @@
 import { Sandbox } from "e2b";
 import { inngest } from "./client.js";
 import { codeAgent } from "./agents/agents.js";
+import { log } from "@/lib/comment.js";
 import {
   createAgent,
   createNetwork,
@@ -24,7 +25,7 @@ export const codeAgentFunction = inngest.createFunction(
   // step -- used for durable step execution
   // event -- contains user input
   async ({ event, step }) => {
-    // console.log("messagerole : ", MessageRole);
+    // log("messagerole : ", MessageRole);
     // get sandbox id
     const sandBoxId = await step.run("get-sandbox-id", async () => {
       //create a sandbox from template "test-base-v-1"
@@ -72,7 +73,7 @@ export const codeAgentFunction = inngest.createFunction(
 
                 return result.stdout;
               } catch (error) {
-                console.error(
+                log(
                   `Command failed: ${error} \nstdout: ${buffers.stdout}\nstderr: ${buffers.stderr}`,
                 );
                 return `Command failed: ${error} \nstdout: ${buffers.stdout}\nstderr: ${buffers.stderr}`;
@@ -110,13 +111,13 @@ export const codeAgentFunction = inngest.createFunction(
 
                 return updatedFiles;
               } catch (error) {
-                console.log("error : ", error);
+                log("error : ", error);
               }
             });
 
             if (typeof newFile === "object") {
               network.state.data.files = newFile;
-              // console.log("AFTER ASSIGNMENT NETWORK:", network);
+              // log("AFTER ASSIGNMENT NETWORK:", network);
             }
           },
         }),
@@ -198,7 +199,7 @@ export const codeAgentFunction = inngest.createFunction(
 
     const finalOutput = await network.run(event.data.value);
 
-    console.log("SUMMARY:", finalOutput?.state?.data?.summary);
+    log("SUMMARY:", finalOutput?.state?.data?.summary);
     const summ = finalOutput?.state?.data?.summary;
 
     const isError =

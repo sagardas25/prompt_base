@@ -8,9 +8,10 @@ import Sandbox from "e2b";
 import z from "zod";
 import { PROMPT } from "../constants/prompt.js";
 import { lastAssistantTextMessageContent } from "../utils/util.js";
+import { log } from "@/lib/comment.js";
 
 export const codeAgent = async ({ sandBoxId, event }) => {
-  // console.log("event  2: ", event);
+  // log("event  2: ", event);
 
   const supportAgent = createAgent({
     name: "code-agent",
@@ -30,15 +31,13 @@ export const codeAgent = async ({ sandBoxId, event }) => {
         }),
 
         handler: async ({ command }, { network, agent, step }) => {
-      
           await step?.run("terminal", async () => {
             const buffers = { stdout: "", stderr: "" };
 
             try {
               const sandbox = await Sandbox.connect(sandBoxId);
-              const res =  await sandbox.commands.run("lsof -i :3000");
-              console.log("res : ",res);
-              
+              const res = await sandbox.commands.run("lsof -i :3000");
+              log("res : ", res);
 
               const result = await sandbox.commands.run(command, {
                 onStdout: (data) => {
@@ -86,7 +85,7 @@ export const codeAgent = async ({ sandBoxId, event }) => {
 
               return updatedFiles;
             } catch (error) {
-              console.log("error : ", error);
+              log("error : ", error);
             }
           });
 
